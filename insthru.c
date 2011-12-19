@@ -402,14 +402,12 @@ int main(int argc, char** argv)
 
 	for (; optind < argc || all; optind += 1 - all) {
 		for (curtest = tests; curtest->name != NULL; curtest++) {
-//			fprintf(stderr, "checking \"%s\" (all:%d)\n", curtest->name, all);
 			if (!all &&
 				strncmp(curtest->name, argv[optind], strlen(curtest->name)))
 				continue;
 			if (all && (curtest->flags & PROCESSED))
 				continue;
 			curtest->flags |= PROCESSED;
-//			fprintf(stderr, "processing \"%s\"\n", curtest->name);
 			bits = bitness;
 			if (!all) {
 				switch(argv[optind][strlen(curtest->name)]) {
