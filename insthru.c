@@ -263,6 +263,9 @@ struct instest tests[] = {
 	{"addi2",   1, 0x00,   0x83,  0, MODRM_EXT | IMM8, 2}, /* add $2, tgt */
 	{"addi4",   1, 0x00,   0x83,  0, MODRM_EXT | IMM8, 4}, /* add $4, tgt */
 	{"addi8",   1, 0x00,   0x83,  0, MODRM_EXT | IMM8, 8}, /* add $8, tgt */
+	{"adc",     1, 0x00,   0x11,  0,                0, 0}, /* adc src,tgt */
+	{"sub",     1, 0x00,   0x29,  0,                0, 0}, /* sub src,tgt */
+	{"sbb",     1, 0x00,   0x1B,  0,                0, 0}, /* sbb src,tgt */
 	{"inc",     1, 0x00,   0xFF,  0,        MODRM_EXT, 0}, /* inc tgt */
 	{"dec",     1, 0x00,   0xFF,  1,        MODRM_EXT, 0}, /* dec tgt */
 	{"mov",     1, 0x00,   0x89,  0,                0, 0}, /* mov src,tgt */
