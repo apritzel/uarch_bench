@@ -74,6 +74,7 @@ struct instest {
 	unsigned opcode_ext;
 	unsigned flags;
 	unsigned imm;
+	struct instest *next;
 };
 
 static unsigned char gen_modrm(struct instest *opcode, int reg)
@@ -181,14 +182,15 @@ static int gen_ins(struct instest *opcode, unsigned char *ptr, int sixtyfour,
 	return cur - ptr;
 }
 
-int populate_code_page(unsigned char *ptr, struct instest *opcode, int unrolled,
-	int sixtyfour, unsigned iterations)
+int populate_code_page(unsigned char *ptr, struct instest *opcodelist,
+	int unrolled, int sixtyfour, unsigned iterations)
 {
 	int i;
 	int loop;
 	uint32_t reg;
 	unsigned char *cur;
 	int jmpdist;
+	struct instest *opcode = opcodelist;
 
     /* we use RAX, RBX, RSI, RDI, R8 .. R11 */
     /* ECX is used for the counter, EDX holds a value as a source operand */
@@ -222,6 +224,8 @@ int populate_code_page(unsigned char *ptr, struct instest *opcode, int unrolled,
 				opcode->flags & SAMEOP ? regs[i] : 2,
 				opcode->flags & SAMEOP ? regs[i] : 1,
 				regs[i]);
+			if (opcode->next != NULL)
+				opcode = opcode->next;
 		}
 	}
 
