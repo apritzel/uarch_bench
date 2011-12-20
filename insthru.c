@@ -77,7 +77,7 @@ struct instest {
 	struct instest *next;
 };
 
-static unsigned char gen_modrm(struct instest *opcode, int reg)
+static unsigned char gen_modrm(struct instest *opcode, int src, int tgt)
 {
 	unsigned char ret;
 
@@ -103,17 +103,17 @@ static unsigned char gen_modrm(struct instest *opcode, int reg)
 	}
 
 	if (!(opcode->flags & MEMOP) && !(opcode->flags & SINGLEOP)) {
-		/* use DX as second source operand for dual op instructions */
-		ret |= ((opcode->flags & SAMEOP) ? (reg & 0x07) : 2) << 3;
+		/* use second source operand for dual op instructions */
+		ret |= (((opcode->flags & SAMEOP) ? tgt : src) & 0x07) << 3;
 	}
 
 	if (opcode->flags & MEMOP && !(opcode->flags & HASSIB)) {
-		/* use DX as base register (in r/m) if needed */
-		ret |= ((opcode->flags & SAMEOP) ? (reg & 0x07) : 2) << 0;
+		/* use base register (in r/m) if needed */
+		ret |= (((opcode->flags & SAMEOP) ? tgt : src) & 0x07) << 0;
 	}
 
 	/* target register is in reg or r/m */
-	ret |= (reg & 0x07) << ((opcode->flags & MEMOP) ? 3 : 0);
+	ret |= (tgt & 0x07) << ((opcode->flags & MEMOP) ? 3 : 0);
 
 	if (opcode->flags & PERMREG)
 		ret = (ret & 0xC0) | ((ret & 0x38) >> 3) | ((ret & 0x07) << 3);
@@ -155,7 +155,7 @@ static int gen_ins(struct instest *opcode, unsigned char *ptr, int sixtyfour,
 
 	*cur++ = opcode->opcode & 0xFF;
 
-	*cur++ = gen_modrm(opcode, tgt);
+	*cur++ = gen_modrm(opcode, src, tgt);
 
 	if (opcode->flags & HASSIB) {
 		/* scale = 0 */
