@@ -52,7 +52,7 @@ sys_perf_event_open(struct perf_event_attr *attr,
 }
 #endif /* HAVE_PERF_EVENT_OPEN_PROTO */
 
-#define MODRM_EXT  (1U <<  0)
+#define SINGLEOP   (1U <<  0)
 #define IMM8       (1U <<  1)
 #define IMM32      (1U <<  2)  
 #define MEMOP      (1U <<  3)
@@ -83,7 +83,7 @@ static unsigned char gen_modrm(struct instest *opcode, int reg)
 
 	ret = 0;
 
-	if (opcode->flags & MODRM_EXT)
+	if (opcode->flags & SINGLEOP)
 		ret |= opcode->opcode_ext << 3;
 
 	if (opcode->flags & HASSIB)
@@ -102,7 +102,7 @@ static unsigned char gen_modrm(struct instest *opcode, int reg)
 		ret |= 0xC0;
 	}
 
-	if (!(opcode->flags & MEMOP) && !(opcode->flags & MODRM_EXT)) {
+	if (!(opcode->flags & MEMOP) && !(opcode->flags & SINGLEOP)) {
 		/* use DX as second source operand for dual op instructions */
 		ret |= ((opcode->flags & SAMEOP) ? (reg & 0x07) : 2) << 3;
 	}
@@ -259,20 +259,20 @@ struct instest tests[] = {
 	{"and",     1, 0x00,   0x21,  0,                0, 0}, /* and src,tgt */
 	{"xor",     1, 0x00,   0x31,  0,                0, 0}, /* xor src,tgt */
 	{"add",     1, 0x00,   0x01,  0,                0, 0}, /* add src,tgt */
-	{"addi",    1, 0x00,   0x83,  0, MODRM_EXT | IMM8, 1}, /* add $1, tgt */
-	{"addi2",   1, 0x00,   0x83,  0, MODRM_EXT | IMM8, 2}, /* add $2, tgt */
-	{"addi4",   1, 0x00,   0x83,  0, MODRM_EXT | IMM8, 4}, /* add $4, tgt */
-	{"addi8",   1, 0x00,   0x83,  0, MODRM_EXT | IMM8, 8}, /* add $8, tgt */
+	{"addi",    1, 0x00,   0x83,  0, SINGLEOP | IMM8, 1}, /* add $1, tgt */
+	{"addi2",   1, 0x00,   0x83,  0, SINGLEOP | IMM8, 2}, /* add $2, tgt */
+	{"addi4",   1, 0x00,   0x83,  0, SINGLEOP | IMM8, 4}, /* add $4, tgt */
+	{"addi8",   1, 0x00,   0x83,  0, SINGLEOP | IMM8, 8}, /* add $8, tgt */
 	{"adc",     1, 0x00,   0x11,  0,                0, 0}, /* adc src,tgt */
 	{"sub",     1, 0x00,   0x29,  0,                0, 0}, /* sub src,tgt */
 	{"sbb",     1, 0x00,   0x1B,  0,                0, 0}, /* sbb src,tgt */
-	{"inc",     1, 0x00,   0xFF,  0,        MODRM_EXT, 0}, /* inc tgt */
-	{"dec",     1, 0x00,   0xFF,  1,        MODRM_EXT, 0}, /* dec tgt */
+	{"inc",     1, 0x00,   0xFF,  0,        SINGLEOP, 0}, /* inc tgt */
+	{"dec",     1, 0x00,   0xFF,  1,        SINGLEOP, 0}, /* dec tgt */
 	{"mov",     1, 0x00,   0x89,  0,                0, 0}, /* mov src,tgt */
-	{"neg",     1, 0x00,   0xF7,  3,        MODRM_EXT, 0}, /* neg tgt */
-	{"not",     1, 0x00,   0xF7,  2,        MODRM_EXT, 0}, /* not tgt */
-	{"shl",     1, 0x00,   0xD1,  4,        MODRM_EXT, 0}, /* shl tgt */
-	{"shl3",    1, 0x00,   0xC1,  4, MODRM_EXT | IMM8, 3}, /* shl $3,tgt */
+	{"neg",     1, 0x00,   0xF7,  3,        SINGLEOP, 0}, /* neg tgt */
+	{"not",     1, 0x00,   0xF7,  2,        SINGLEOP, 0}, /* not tgt */
+	{"shl",     1, 0x00,   0xD1,  4,        SINGLEOP, 0}, /* shl tgt */
+	{"shl3",    1, 0x00,   0xC1,  4, SINGLEOP | IMM8, 3}, /* shl $3,tgt */
 	{"leam",    1, 0x00,   0x8D,  0,            MEMOP, 0}, /* lea (src),tgt */
 	{"leai",    1, 0x00,   0x8D,  0,MEMOP | IMM8 | SAMEOP, 1}, /* lea $1(tgt),tgt */
 	{"leas",    1, 0x00,   0x8D,  0,MEMOP | HASSIB | SCALE2 | SAMEOP, 0}, /* lea (,tgt,1) */
@@ -281,7 +281,7 @@ struct instest tests[] = {
 	{"leaa4",   1, 0x00,   0x8D,  0,MEMOP | HASSIB | IMM8, 4}, /* lea $4(src, src2), tgt */
 	{"leacplx", 1, 0x00,   0x8D,  0,MEMOP | HASSIB | IMM8 | SCALE4, 16}, /* lea $16(src,src2,4),tgt */
 	{"imul",    2, 0x00, 0x0FAF,  0,          PERMREG, 0}, /* imul src, tgt */
-	{"mul",     1, 0x00,   0xF7,  4,        MODRM_EXT, 0}, /* mul src */
+	{"mul",     1, 0x00,   0xF7,  4,        SINGLEOP, 0}, /* mul src */
 	{"popcnt",  2, 0xF3, 0x0FB8,  0,          REPPREF, 0}, /* popcnt src, tgt */
 	{"lzcnt",   2, 0xF3, 0x0FBD,  0,          REPPREF, 0}, /* lzcnt src, tgt */
 
