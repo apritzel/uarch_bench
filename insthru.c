@@ -139,6 +139,8 @@ static int gen_ins(struct instest *opcode, unsigned char *ptr, int sixtyfour,
 		/* set fourth register bit for either target or source */
 		if (tgt >= 8)
 			*cur |= (opcode->flags & (PERMREG | MEMOP)) ? 0x04 : 0x01;
+		if (src >= 8)
+			*cur |= (opcode->flags & (PERMREG | MEMOP)) ? 0x01 : 0x04;
 		cur++;
 	}
 
