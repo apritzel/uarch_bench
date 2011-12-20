@@ -281,8 +281,9 @@ struct instest tests[] = {
 	{"leaa4",   1, 0x00,   0x8D,  0,MEMOP | HASSIB | IMM8, 4}, /* lea $4(src, src2), tgt */
 	{"leacplx", 1, 0x00,   0x8D,  0,MEMOP | HASSIB | IMM8 | SCALE4, 16}, /* lea $16(src,src2,4),tgt */
 	{"imul",    2, 0x00, 0x0FAF,  0,          PERMREG, 0}, /* imul src, tgt */
+	{"mul",     1, 0x00,   0xF7,  4,        MODRM_EXT, 0}, /* mul src */
 	{"popcnt",  2, 0xF3, 0x0FB8,  0,          REPPREF, 0}, /* popcnt src, tgt */
-	{"lzcnt",  2, 0xF3, 0x0FBD,  0,          REPPREF, 0}, /* lzcnt src, tgt */
+	{"lzcnt",   2, 0xF3, 0x0FBD,  0,          REPPREF, 0}, /* lzcnt src, tgt */
 
 	{NULL, 0}
 };
