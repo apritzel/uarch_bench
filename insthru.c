@@ -307,6 +307,7 @@ static void usage(FILE *outf, const char *progname)
 	fprintf(outf, "\t-i iter: repeat the 8 instructions <iter> times in a\n");
 	fprintf(outf, "\t         loop, default is 1 million\n");
 	fprintf(outf, "\t-r loop: roll out the loops <loop> times, default: 8\n");
+	fprintf(outf, "\t-c file: load binary code from file and execute that\n");
 	fprintf(outf, "\t-a     : run all defined tests in a row\n");
 	fprintf(outf, "\ttest   : test name, can be followed by .32 or .64 to\n");
 	fprintf(outf, "\t         explicitly specify the operand bitness\n");
@@ -334,8 +335,11 @@ int main(int argc, char** argv)
 	int bitness = 64, bits;
 	int all = 0;
 	int verbose = 0;
+	char *codefn = NULL;
+	size_t mapsize = 4096;
+	FILE *codefd = NULL;
 
-	while ((opt = getopt(argc, argv, "h?d3r:n:i:lav")) != -1) {
+	while ((opt = getopt(argc, argv, "h?d3r:n:i:c:lav")) != -1) {
 		switch(opt) {
 		case '?': case 'h':
 			usage(stdout, argv[0]);
@@ -364,6 +368,9 @@ int main(int argc, char** argv)
 		case 'r':
 			rollout = atoi(optarg);
 			break;
+		case 'c':
+			codefn = optarg;
+			break;
 		}
 	}
 
@@ -377,12 +384,30 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	ptr = mmap(NULL, 4096, PROT_READ | PROT_WRITE | PROT_EXEC,
+	if (codefn != NULL) {
+
+		codefd = fopen(codefn, "rb");
+		if (codefd == NULL) {
+			perror("open");
+			exit(2);
+		}
+		if (fseek(codefd, 0, SEEK_END) == 0) {
+			mapsize = (ftell(codefd) + 4095) & ~4095UL;
+			fseek(codefd, 0, SEEK_SET);
+		}
+	}
+
+	ptr = mmap(NULL, mapsize, PROT_READ | PROT_WRITE | PROT_EXEC,
 		MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	if (ptr == NULL) {
 		perror("mapping executable memory");
 		return 1;
 	}
+	if (codefn != NULL) {
+		fread(ptr, 1, mapsize, codefd);
+		fclose(codefd);
+	}
+
 	benchfunc = (void*)ptr;
 
 	if (action != ACTION_DUMP) {
@@ -411,7 +436,7 @@ int main(int argc, char** argv)
 
 	for (; optind < argc || all; optind += 1 - all) {
 		for (curtest = tests; curtest->name != NULL; curtest++) {
-			if (!all &&
+			if ((!all && codefn == NULL) &&
 				strncmp(curtest->name, argv[optind], strlen(curtest->name)))
 				continue;
 			if (all && (curtest->flags & PROCESSED))
@@ -429,11 +454,13 @@ int main(int argc, char** argv)
 				}
 			}
 
-			len = populate_code_page(ptr, curtest, rollout, bits == 64,
-				iterations);
-			if (action == ACTION_DUMP) {
-				write(1, ptr, len);
-				break;
+			if (codefn == NULL) {
+				len = populate_code_page(ptr, curtest, rollout, bits == 64,
+					iterations);
+				if (action == ACTION_DUMP) {
+					write(1, ptr, len);
+					break;
+				}
 			}
 			sum[0] = 0; sum[1] = 0;
 			min[0] = UINT64_MAX; min[1] = UINT64_MAX;
@@ -492,7 +519,7 @@ int main(int argc, char** argv)
 		close(perffd[0]);
 	}
 
-	munmap(ptr, 4096);
+	munmap(ptr, mapsize);
 
 	return 0;
 }
