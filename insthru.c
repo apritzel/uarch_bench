@@ -266,6 +266,8 @@ struct instest tests[] = {
 	{"addi4",   1, 0x00,   0x83,  0, SINGLEOP | IMM8, 4}, /* add $4, tgt */
 	{"addi8",   1, 0x00,   0x83,  0, SINGLEOP | IMM8, 8}, /* add $8, tgt */
 	{"adc",     1, 0x00,   0x11,  0,                0, 0}, /* adc src,tgt */
+	{"xadd",    2, 0x00, 0x0FC1,  0,                0, 0}, /* xadd src,tgt */
+	{"xchg",    1, 0x00,   0x87,  0,                0, 0}, /* xchg src,tgt */
 	{"sub",     1, 0x00,   0x29,  0,                0, 0}, /* sub src,tgt */
 	{"sbb",     1, 0x00,   0x1B,  0,                0, 0}, /* sbb src,tgt */
 	{"inc",     1, 0x00,   0xFF,  0,        SINGLEOP, 0}, /* inc tgt */
