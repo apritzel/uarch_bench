@@ -292,6 +292,7 @@ struct instest tests[] = {
 	{"mul",     1, 0x00,   0xF7,  4,         SINGLEOP, 0}, /* mul src */
 	{"popcnt",  2, 0xF3, 0x0FB8,  0,          REPPREF, 0}, /* popcnt src, tgt */
 	{"lzcnt",   2, 0xF3, 0x0FBD,  0,          REPPREF, 0}, /* lzcnt src, tgt */
+	{"div",     1, 0x00,   0xF7,  6,SINGLEOP | PERMREG,  0}, /* div tgt */
 
 	{NULL, 0}
 /*   name, length, pref, opcode,ext,     flags       , imm */
