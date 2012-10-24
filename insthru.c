@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Andre Przywara <osp@andrep.de>
+ * Copyright 2011,2012 Andre Przywara <osp@andrep.de>
  *
  * This file is part of uarch_bench (measuring instruction throughput)
  *
