@@ -115,8 +115,12 @@ static unsigned char gen_modrm(struct instest *opcode, int src, int tgt)
 	/* target register is in reg or r/m */
 	ret |= (tgt & 0x07) << ((opcode->flags & MEMOP) ? 3 : 0);
 
-	if (opcode->flags & PERMREG)
-		ret = (ret & 0xC0) | ((ret & 0x38) >> 3) | ((ret & 0x07) << 3);
+	if (opcode->flags & PERMREG) {
+		if (opcode->flags & SINGLEOP)
+			ret = (ret & 0xF8) | (src & 0x07);
+		else
+			ret = (ret & 0xC0) | ((ret & 0x38) >> 3) | ((ret & 0x07) << 3);
+	}
 
 	return ret;
 }
@@ -203,7 +207,7 @@ int populate_code_page(unsigned char *ptr, struct instest *opcodelist,
 		0x56, 0x57, 0x41, 0x50, 0x41, 0x51, /* push rsi, rdi, r8, r9 */
 		0x41, 0x52, 0x41, 0x53, /* push r10, r11 */
 		0xB9, 0x00, 0x00, 0x00, 0x00, /* mov $imm, %ecx (patched later) */
-		0xBA, 0x00, 0x00, 0x00, 0x00, /* mov $imm, %edx (patched later) */
+		0xBB, 0x00, 0x00, 0x00, 0x00, /* mov $imm, %ebx (patched later) */
 		0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 /* NOP */
 	};
 	unsigned char leave[] = {
@@ -223,7 +227,7 @@ int populate_code_page(unsigned char *ptr, struct instest *opcodelist,
 	for (loop = 0; loop < unrolled; loop++) {
 		for (i = 0; i < 8; i++) {
 			cur += gen_ins(opcode, cur, sixtyfour,
-				opcode->flags & SAMEOP ? regs[i] : 2,
+				opcode->flags & SAMEOP ? regs[i] : 3,
 				opcode->flags & SAMEOP ? regs[i] : 1,
 				regs[i]);
 			if (opcode->next != NULL)
