@@ -256,7 +256,7 @@ int populate_code_page(unsigned char *ptr, struct instest *opcodelist,
 #define ACTION_LIST 2
 
 struct instest tests[] = {
-/*   name, length, pref,   opcode,ext,     flags    , mod_rm, imm */
+/*   name, length, pref, opcode,ext,     flags       , imm */
 	{"or",      1, 0x00,   0x09,  0,                0, 0}, /* or  src,tgt */
 	{"and",     1, 0x00,   0x21,  0,                0, 0}, /* and src,tgt */
 	{"xor",     1, 0x00,   0x31,  0,                0, 0}, /* xor src,tgt */
@@ -285,11 +285,12 @@ struct instest tests[] = {
 	{"leaa4",   1, 0x00,   0x8D,  0,MEMOP | HASSIB | IMM8, 4}, /* lea $4(src, src2), tgt */
 	{"leacplx", 1, 0x00,   0x8D,  0,MEMOP | HASSIB | IMM8 | SCALE4, 16}, /* lea $16(src,src2,4),tgt */
 	{"imul",    2, 0x00, 0x0FAF,  0,          PERMREG, 0}, /* imul src, tgt */
-	{"mul",     1, 0x00,   0xF7,  4,        SINGLEOP, 0}, /* mul src */
+	{"mul",     1, 0x00,   0xF7,  4,         SINGLEOP, 0}, /* mul src */
 	{"popcnt",  2, 0xF3, 0x0FB8,  0,          REPPREF, 0}, /* popcnt src, tgt */
 	{"lzcnt",   2, 0xF3, 0x0FBD,  0,          REPPREF, 0}, /* lzcnt src, tgt */
 
 	{NULL, 0}
+/*   name, length, pref, opcode,ext,     flags       , imm */
 };
 
 static void usage(FILE *outf, const char *progname)
