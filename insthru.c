@@ -40,6 +40,9 @@
 #if defined(__x86_64__)
 #include "codegen_x86.h"
 #include "ins_x86.h"
+#else
+#pragma GCC diagnostic error "-Wfatal-errors"
+#error "architecture not supported"
 #endif
 
 #ifndef HAVE_PERF_EVENT_OPEN_PROTO
