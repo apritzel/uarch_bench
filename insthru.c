@@ -37,8 +37,10 @@
 
 #include <linux/perf_event.h>
 
+#if defined(__x86_64__)
 #include "codegen_x86.h"
 #include "ins_x86.h"
+#endif
 
 #ifndef HAVE_PERF_EVENT_OPEN_PROTO
 

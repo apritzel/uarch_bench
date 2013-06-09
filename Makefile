@@ -3,9 +3,15 @@ CC=gcc
 CFLAGS=-Wall -O
 LDFLAGS=
 
+ARCH=$(shell uname -m)
+ifeq ($(ARCH),x86_64)
+CODEGEN=codegen_x86.o
 all: insthru
+else
+all:
+endif
 
-insthru: insthru.o codegen_x86.o
+insthru: insthru.o $(CODEGEN)
 	$(CC) $(LDFLAGS) -o $@ $^
 
 .PHONY: clean distclean
