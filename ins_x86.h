@@ -18,7 +18,9 @@
  * along with uarch_bench.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-struct instest tests[] = {
+#include "codegen_x86.h"
+
+struct instest_x86 tests[] = {
 /*   name, length, pref, opcode,ext,     flags       , imm */
 	{"or",      1, 0x00,   0x09,  0,                0, 0}, /* or  src,tgt */
 	{"and",     1, 0x00,   0x21,  0,                0, 0}, /* and src,tgt */
