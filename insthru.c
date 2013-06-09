@@ -73,6 +73,7 @@ static void usage(FILE *outf, const char *progname)
 	fprintf(outf, "\t-l     : list all defined tests\n");
 	fprintf(outf, "\t-d     : dump generated code to stdout\n");
 	fprintf(outf, "\t-3     : generate code with 32-bit operands by default\n");
+	fprintf(outf, "\t-6     : generate code with 64-bit operands by default\n");
 	fprintf(outf, "\t-n runs: repeat each run <runs> times and average\n");
 	fprintf(outf, "\t-i iter: repeat the 8 instructions <iter> times in a\n");
 	fprintf(outf, "\t         loop, default is 1 million\n");
@@ -102,14 +103,14 @@ int main(int argc, char** argv)
 	int nrruns = 20;
 	int iterations = 1000000;
 	int rollout = 8;
-	int bitness = 64, bits;
+	int bits, bitness = DEFAULT_BITNESS;
 	int all = 0;
 	int verbose = 0;
 	char *codefn = NULL;
 	size_t mapsize = 4096;
 	FILE *codefd = NULL;
 
-	while ((opt = getopt(argc, argv, "h?d3r:n:i:c:lav")) != -1) {
+	while ((opt = getopt(argc, argv, "h?d36r:n:i:c:lav")) != -1) {
 		switch(opt) {
 		case '?': case 'h':
 			usage(stdout, argv[0]);
@@ -128,6 +129,9 @@ int main(int argc, char** argv)
 			break;
 		case '3':
 			bitness = 32;
+			break;
+		case '6':
+			bitness = 64;
 			break;
 		case 'n':
 			nrruns = atoi(optarg);

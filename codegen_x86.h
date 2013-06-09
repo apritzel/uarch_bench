@@ -18,6 +18,12 @@
  * along with uarch_bench.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#ifdef __x86_64__
+#define DEFAULT_BITNESS 64
+#else
+#define DEFAULT_BITNESS 32
+#endif
+
 #define SINGLEOP   (1U <<  0)
 #define IMM8       (1U <<  1)
 #define IMM32      (1U <<  2)  
