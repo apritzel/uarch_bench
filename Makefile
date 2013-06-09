@@ -8,7 +8,10 @@ all: insthru
 insthru: insthru.o codegen_x86.o
 	$(CC) $(LDFLAGS) -o $@ $^
 
-.PHONY: clean
+.PHONY: clean distclean
 
 clean:
-	rm -f *.o insthru
+	rm -f *.o
+
+distclean: clean
+	rm -f insthru
