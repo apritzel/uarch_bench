@@ -154,11 +154,9 @@ int main(int argc, char** argv)
 	}
 
 	if (action == ACTION_LIST) {
+		char strbuf[64];
 		for (curtest = tests; curtest->name != NULL; curtest++) {
-			fprintf(stdout, "%s (", curtest->name);
-			if (curtest->inslen > 1)
-				fprintf(stdout, "0x%02x ", curtest->opcode >> 8);
-			fprintf(stdout, "0x%02x)\n", curtest->opcode & 0xFF);
+			fprintf(stdout, "%s\n", format_ins(curtest, strbuf, 64));
 		}
 		return 0;
 	}

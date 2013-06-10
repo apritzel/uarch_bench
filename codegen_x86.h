@@ -52,4 +52,6 @@ struct instest_x86 {
 int populate_code_page(unsigned char *ptr, struct instest_x86 *opcodelist,
 	int unrolled, int sixtyfour, unsigned iterations);
 
+char* format_ins(struct instest *ins, char *buffer, int buflen);
+
 #endif

@@ -16,6 +16,7 @@
  * along with uarch_bench.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
@@ -202,4 +203,17 @@ int populate_code_page(unsigned char *ptr, struct instest_x86 *opcodelist,
 	cur++;
 
 	return (cur - ptr) + sizeof(leave);
+}
+
+char* format_ins(struct instest *ins, char *buffer, int buflen)
+{
+	int written;
+
+	written = snprintf(buffer, buflen, "%s (", ins->name);
+	if (ins->inslen > 1)
+		written += snprintf(buffer + written, buflen - written, "0x%02x ",
+			ins->opcode >> 8);
+	written += snprintf(buffer + written, buflen - written, "%02x)",
+		ins->opcode & 0xFF);
+	return buffer;
 }
