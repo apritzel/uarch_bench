@@ -7,6 +7,9 @@ ARCH=$(shell uname -m)
 ifeq ($(ARCH),x86_64)
 CODEGEN=codegen_x86.o
 all: insthru
+else ifeq ($(ARCH),i686)
+CODEGEN=codegen_x86.o
+all: insthru
 else
 $(warning architecture $(ARCH) not supported.)
 all:

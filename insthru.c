@@ -37,7 +37,7 @@
 
 #include <linux/perf_event.h>
 
-#if defined(__x86_64__)
+#if defined(__x86_64__) || defined(__i386__)
 #include "codegen_x86.h"
 #include "ins_x86.h"
 #else

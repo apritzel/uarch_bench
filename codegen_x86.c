@@ -142,6 +142,7 @@ int populate_code_page(unsigned char *ptr, struct instest_x86 *opcodelist,
 	int unrolled, int sixtyfour, unsigned iterations)
 {
 	int i;
+	int patchoffset;
 	int loop;
 	uint32_t reg;
 	unsigned char *cur;
@@ -152,7 +153,8 @@ int populate_code_page(unsigned char *ptr, struct instest_x86 *opcodelist,
     /* ECX is used for the counter, EDX holds a value as a source operand */
 	unsigned regs[8] = { 0, 3, 6, 7, 8, 9, 10, 11};
 
-	unsigned char setup[32] = {
+#ifdef __x86_64__
+	unsigned char setup_64[32] = {
 		0x50, 0x51, 0x52, 0x53, /* push rax, rcx, rdx, rbx */
 		0x56, 0x57, 0x41, 0x50, 0x41, 0x51, /* push rsi, rdi, r8, r9 */
 		0x41, 0x52, 0x41, 0x53, /* push r10, r11 */
@@ -160,18 +162,47 @@ int populate_code_page(unsigned char *ptr, struct instest_x86 *opcodelist,
 		0xBB, 0x00, 0x00, 0x00, 0x00, /* mov $imm, %ebx (patched later) */
 		0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 /* NOP */
 	};
-	unsigned char leave[] = {
+#elif __i386__
+	unsigned char setup_32[32] = {
+		0x50, 0x51, 0x52, 0x53, /* push eax, ecx, edx, ebx */
+		0x56, 0x57, /* push esi, edi */
+		0xB9, 0x00, 0x00, 0x00, 0x00, /* mov $imm, %ecx (patched later) */
+		0xBB, 0x00, 0x00, 0x00, 0x00, /* mov $imm, %ebx (patched later) */
+		0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, /* NOP */
+		0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90, 0x90 /* NOP */
+	};
+#endif
+#ifdef __x86_64__
+	unsigned char leave_64[] = {
 		0x41, 0x5B, 0x41, 0x5A, 0x41, 0x59, 0x41, 0x58, /*pop r10, r11, r9, r8*/
 		0x5F, 0x5E, 0x5B, 0x5A, 0x59, 0x58, /* pop rbx, rdx, rcx, rax */
-		0xC3 /* ret */};
+		0xC3 /* ret */
+	};
+#elif __i386__
+	unsigned char leave_32[] = {
+		0x5F, 0x5E, 0x5B, 0x5A, 0x59, 0x58, /* pop edi, esi, ebx, edx, ecx, eax */
+		0xC3 /* ret */
+	};
+#endif
+
+#ifdef __x86_64__
+	#define setup setup_64
+	#define leave leave_64 
+	patchoffset = 15;
+#else
+	#define setup setup_32
+	#define leave leave_32
+	patchoffset = 7;
+	for (i = 0; i < 4; i++)
+		regs[i + 4] = regs[i];
+#endif
 
 	memcpy(ptr, setup, 32);
-
 	/* fixup actual content of loop counter and the data value */
 	reg = iterations;
-	memcpy(ptr + 15, &reg, 4);
+	memcpy(ptr + patchoffset, &reg, 4);
 	reg = 0x39512804;
-	memcpy(ptr + 20, &reg, 4);
+	memcpy(ptr + patchoffset + 5, &reg, 4);
 
 	cur = ptr + 32;
 	for (loop = 0; loop < unrolled; loop++) {
